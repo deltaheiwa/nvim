@@ -59,10 +59,23 @@ local config = function()
 		},
 	})
 
+  -- cpp
+  lspconfig.clangd.setup({
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = {
+      clangd = {
+        
+      }
+    }
+  })
+
 	local luacheck = require("efmls-configs.linters.luacheck")
 	local stylua = require("efmls-configs.formatters.stylua")
 	local flake8 = require("efmls-configs.linters.flake8")
 	local black = require("efmls-configs.formatters.black")
+  local cpplint = require("efmls-configs.linters.cpplint")
+  local clang_format = require("efmls-configs.formatters.clang_format")
 
 	-- efm server
 	lspconfig.efm.setup({
@@ -79,6 +92,7 @@ local config = function()
 			languages = {
 				lua = { luacheck, stylua },
 				python = { flake8, black },
+        cpp = { cpplint, clang_format }
 			},
 		},
 	})
