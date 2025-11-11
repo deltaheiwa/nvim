@@ -103,8 +103,19 @@ vim.o.number = true
 -- Relative line numbers, to help with jumping.
 vim.o.relativenumber = true
 
+-- Tab / Indentation
+vim.o.tabstop = 2 -- spaces when pressing Tab
+vim.o.shiftwidth = 2 -- spaces at each level of indentation
+vim.o.softtabstop = 2 -- spaces when pressing Tab in Insert mode
+vim.o.expandtab = true -- converts tabs into spaces
+vim.o.smartindent = true -- auto-indentation
+vim.o.wrap = false -- text wrap
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
+
+-- Cursor. Uhh... -- https://neovim.io/doc/user/options.html#'guicursor'
+vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,a:blinkon500-blinkwait175'
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
@@ -931,6 +942,9 @@ require('lazy').setup({
       -- Automatically add surroundings
       require('mini.pairs').setup()
 
+      -- Join and split arguments
+      require('mini.splitjoin').setup()
+
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
@@ -996,7 +1010,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
