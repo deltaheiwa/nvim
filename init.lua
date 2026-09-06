@@ -320,6 +320,12 @@ do
         vim.cmd 'TSUpdate'
         return
       end
+
+      if name == 'cord.nvim' then
+        if not ev.data.active then vim.cmd.packadd 'cord.nvim' end
+        vim.cmd 'Cord update'
+        return
+      end
     end,
   })
 end
@@ -601,6 +607,29 @@ end
 -- SECTION 5: LSP
 -- LSP keymaps, server configuration, Mason tools installations
 -- ============================================================
+
+local function clangd_nix_query_driver()
+    local seen, drivers = {}, {}
+
+    local function add(path)
+      if not path or path == '' or seen[path] then return end
+      seen[path] = true
+      drivers[#drivers + 1] = path
+    end
+
+    for _, exe in ipairs { 'cc', 'c++', 'gcc', 'g++', 'clang', 'clang++' } do
+      local path = vim.fn.exepath(exe)
+      if path ~= '' then
+        add(path)
+        add(vim.uv.fs_realpath(path))
+      end
+    end
+
+    if vim.uv.fs_stat '/nix/store' then add '/nix/store/*/bin/*' end
+
+    if #drivers == 0 then return nil end
+    return '--query-driver=' .. table.concat(drivers, ',')
+end
 do
   -- [[ LSP Configuration ]]
   -- Brief aside: **What is LSP?**
@@ -700,15 +729,39 @@ do
     end,
   })
 
+  local clangd_cmd = {
+        'clangd',
+        '--background-index',
+        '--clang-tidy',
+  }
+  table.insert(clangd_cmd, clangd_nix_query_driver())
+
   -- Enable the following language servers
   --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    -- clangd = {},
+    clangd = {
+      cmd = clangd_cmd
+    },
     -- gopls = {},
     pyright = {},
-    rust_analyzer = {},
+    rust_analyzer = {
+      settings = {
+        ['rust-analyzer'] = {
+          inlayHints = {
+            typeHints = { enable = true },
+            parameterHints = { enable = false },
+            chainingHints = { enable = false },
+            bindingModeHints = { enable = false },
+            closureReturnTypeHints = { enable = 'never' },
+            lifetimeElisionHints = { enable = 'never' },
+            reborrowHints = { enable = false },
+            closingBraceHints = { enable = false },
+          },
+        },
+      },
+    },
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
     --    https://github.com/pmizio/typescript-tools.nvim
