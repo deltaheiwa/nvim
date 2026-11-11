@@ -11,4 +11,5 @@ spell/
 # merge conflicts.
 nvim-pack-lock.json
 
+*.orig
 .DS_Store
